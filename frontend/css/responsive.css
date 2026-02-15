@@ -1,0 +1,233 @@
+/* ===================================
+   DEALIFY - Responsive Styles
+   Mobile-first approach
+   =================================== */
+
+/* ---- Tablet & Below (max-width: 1024px) ---- */
+@media (max-width: 1024px) {
+  :root {
+    --sidebar-width: 220px;
+  }
+
+  .auth-brand {
+    padding: var(--space-2xl);
+  }
+
+  .auth-brand h2 {
+    font-size: var(--font-size-xl);
+  }
+
+  .auth-features {
+    display: none;
+  }
+}
+
+/* ---- Mobile Landscape & Below (max-width: 768px) ---- */
+@media (max-width: 768px) {
+  :root {
+    --navbar-height: 56px;
+  }
+
+  h1 { font-size: var(--font-size-2xl); }
+  h2 { font-size: var(--font-size-xl); }
+  h3 { font-size: var(--font-size-lg); }
+
+  .container {
+    padding: 0 var(--space-sm);
+  }
+
+  /* ---- Auth Page Mobile ---- */
+  .auth-page {
+    flex-direction: column;
+  }
+
+  .auth-brand {
+    display: none;
+  }
+
+  .auth-form-container {
+    flex: 1;
+    padding: var(--space-md);
+    align-items: flex-start;
+    padding-top: var(--space-2xl);
+  }
+
+  .auth-card {
+    max-width: 100%;
+    padding: var(--space-xl) var(--space-lg);
+    border-radius: var(--radius-lg);
+  }
+
+  .auth-card-logo {
+    display: block; /* Show logo on mobile since brand panel is hidden */
+  }
+
+  .auth-card-header h2 {
+    font-size: var(--font-size-xl);
+  }
+
+  /* ---- Navbar Mobile ---- */
+  .navbar-menu {
+    display: none;
+    position: fixed;
+    inset: 0;
+    top: var(--navbar-height);
+    background: var(--white);
+    flex-direction: column;
+    padding: var(--space-lg);
+    z-index: 999;
+    border-top: 1px solid var(--gray-200);
+    overflow-y: auto;
+  }
+
+  .navbar-menu.active {
+    display: flex;
+  }
+
+  .hamburger {
+    display: flex !important;
+  }
+
+  .navbar-search {
+    display: none;
+  }
+
+  .navbar-search-mobile {
+    display: block !important;
+    padding: var(--space-sm) var(--space-md);
+    background: var(--white);
+    border-bottom: 1px solid var(--gray-100);
+  }
+
+  /* ---- Dashboard Mobile ---- */
+  .dashboard-sidebar {
+    position: fixed;
+    left: -100%;
+    top: calc(var(--navbar-height) + var(--strip-height, 0px));
+    bottom: 0;
+    width: 280px;
+    z-index: 998;
+    transition: left var(--transition-base);
+    box-shadow: var(--shadow-xl);
+  }
+
+  .dashboard-sidebar.active {
+    left: 0;
+  }
+
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    top: calc(var(--navbar-height) + var(--strip-height, 0px));
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 997;
+  }
+
+  .sidebar-overlay.active {
+    display: block;
+  }
+
+  .dashboard-content {
+    margin-left: 0 !important;
+    padding: var(--space-md) !important;
+  }
+
+  .sidebar-toggle {
+    display: flex !important;
+  }
+
+  /* ---- Tables Mobile ---- */
+  .table-wrapper {
+    font-size: var(--font-size-xs);
+  }
+
+  .table th, .table td {
+    padding: var(--space-sm);
+  }
+
+  /* ---- Modal Mobile ---- */
+  .modal {
+    max-width: 100%;
+    margin: var(--space-md);
+    max-height: 80vh;
+  }
+
+  /* ---- Toast Mobile ---- */
+  .toast-container {
+    left: var(--space-md);
+    right: var(--space-md);
+    top: calc(var(--navbar-height) + 10px);
+  }
+
+  .toast {
+    min-width: auto;
+    width: 100%;
+  }
+
+  /* ---- Pagination Mobile ---- */
+  .pagination-btn {
+    width: 32px;
+    height: 32px;
+    font-size: var(--font-size-xs);
+  }
+
+  /* Seller Steps Mobile */
+  .step-line {
+    width: 24px;
+  }
+
+  .step-dot {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+/* ---- Small Mobile (max-width: 480px) ---- */
+@media (max-width: 480px) {
+  .auth-card {
+    padding: var(--space-lg) var(--space-md);
+  }
+
+  .auth-submit {
+    padding: 0.75rem;
+    font-size: var(--font-size-sm);
+  }
+
+  .auth-actions {
+    flex-direction: column;
+    gap: var(--space-sm);
+    align-items: flex-start;
+  }
+
+  .step-buttons {
+    flex-direction: column;
+  }
+
+  .step-buttons .btn {
+    width: 100%;
+  }
+
+  /* Cards stack fully */
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ---- Very Small Mobile (max-width: 360px) ---- */
+@media (max-width: 360px) {
+  html {
+    font-size: 14px;
+  }
+
+  .auth-card {
+    padding: var(--space-md);
+  }
+}
+
+/* ---- Large Screens (min-width: 1440px) ---- */
+@media (min-width: 1440px) {
+  :root {
+    --max-width: 1400px;
+  }
+}

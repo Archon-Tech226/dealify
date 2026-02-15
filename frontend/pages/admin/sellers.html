@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seller Management - Dealify Admin</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🛍️%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/dashboard.css">
+  <link rel="stylesheet" href="../../css/responsive.css">
+  <style>
+    body { font-family: 'Inter', var(--font-family); }
+    .navbar { background: linear-gradient(135deg, #1E1B4B, #312E81) !important; }
+    .navbar .navbar-logo, .navbar .navbar-logo span { color: #fff !important; }
+    .navbar .navbar-link, .navbar .navbar-link span { color: #fff !important; }
+    .admin-badge { background: linear-gradient(135deg, #EF4444, #DC2626); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; }
+    .dashboard-sidebar { background: #1E1B4B; border-right: none; }
+    .sidebar-header { background: linear-gradient(135deg, #312E81, #3730A3); border-bottom: 1px solid #4338CA; }
+    .sidebar-avatar { background: #EF4444 !important; color: #fff !important; }
+    .sidebar-user-info h4 { color: #fff !important; }
+    .sidebar-user-info p { color: #A5B4FC !important; }
+    .sidebar-link { color: #C7D2FE !important; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.08) !important; }
+    .sidebar-link.active { background: rgba(99,102,241,0.2) !important; color: #fff !important; border-left: 3px solid #818CF8; }
+
+    .status-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .status-tab { padding: 8px 16px; border-radius: 8px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: 2px solid var(--border); background: #fff; }
+    .status-tab.active { border-color: #312E81; background: #EEF2FF; color: #312E81; }
+
+    .seller-card { background: #fff; border-radius: 12px; border: 1px solid var(--border); padding: 20px; margin-bottom: 12px; display: flex; gap: 16px; align-items: flex-start; flex-wrap: wrap; }
+    .seller-avatar { width: 56px; height: 56px; border-radius: 50%; background: #FED7AA; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2rem; color: #D97706; }
+    .seller-info { flex: 1; min-width: 200px; }
+    .seller-name { font-weight: 700; font-size: 1rem; }
+    .seller-email { font-size: 0.85rem; color: var(--muted); }
+    .seller-meta { font-size: 0.8rem; color: var(--text-secondary); margin-top: 6px; }
+    .seller-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .seller-actions button { padding: 8px 16px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; cursor: pointer; border: none; }
+    .btn-approve { background: #10B981; color: #fff; }
+    .btn-reject { background: #EF4444; color: #fff; }
+    .btn-view { background: #E0E7FF; color: #4338CA; }
+    .approval-badge { padding: 2px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+    .approval-pending { background: #FEF3C7; color: #92400E; }
+    .approval-approved { background: #D1FAE5; color: #065F46; }
+    .approval-rejected { background: #FEE2E2; color: #991B1B; }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="admin-role-strip">🛡️ <strong>ADMIN PANEL</strong> — Full Platform Control</div>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="../../index.html" class="navbar-logo">Deal<span>ify</span></a>
+      <div style="flex:1;"></div>
+      <div class="navbar-actions">
+        <span class="admin-badge">ADMIN</span>
+        <div class="user-dropdown">
+          <button class="navbar-link" id="userDropdownBtn"><i data-lucide="shield"></i><span id="navUserName">Admin</span></button>
+          <div class="user-dropdown-menu" id="userDropdownMenu">
+            <a href="dashboard.html"><i data-lucide="layout-dashboard" style="width:16px;height:16px;"></i> Dashboard</a>
+            <div class="user-dropdown-divider"></div>
+            <button onclick="logout()"><i data-lucide="log-out" style="width:16px;height:16px;"></i> Logout</button>
+          </div>
+        </div>
+      </div>
+      <div class="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></div>
+    </div>
+  </nav>
+  <div class="toast-container" id="toastContainer"></div>
+
+  <div class="dashboard-wrapper">
+    <aside class="dashboard-sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-avatar" id="sidebarAvatar">A</div>
+        <div class="sidebar-user-info"><h4 id="sidebarName">Admin</h4><p style="font-size:0.7rem;">Super Admin</p></div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="sidebar-link"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+        <a href="users.html" class="sidebar-link"><i data-lucide="users"></i> All Users</a>
+        <a href="sellers.html" class="sidebar-link active"><i data-lucide="store"></i> Sellers</a>
+        <a href="products.html" class="sidebar-link"><i data-lucide="package"></i> Products</a>
+        <a href="categories.html" class="sidebar-link"><i data-lucide="grid-3x3"></i> Categories</a>
+        <a href="orders.html" class="sidebar-link"><i data-lucide="shopping-bag"></i> Orders</a>
+        <a href="coupons.html" class="sidebar-link"><i data-lucide="ticket"></i> Coupons</a>
+        <a href="#" class="sidebar-link" onclick="logout()"><i data-lucide="log-out"></i> Logout</a>
+      </nav>
+    </aside>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <main class="dashboard-content">
+      <div class="page-header"><h1>🏪 Seller Management</h1></div>
+
+      <div class="status-tabs" id="statusTabs">
+        <button class="status-tab active" data-status="all">All Sellers</button>
+        <button class="status-tab" data-status="pending">⏳ Pending</button>
+        <button class="status-tab" data-status="approved">✅ Approved</button>
+        <button class="status-tab" data-status="rejected">❌ Rejected</button>
+      </div>
+
+      <div id="sellersList"></div>
+    </main>
+  </div>
+
+  <script src="../../js/app.js"></script>
+  <script>
+    let allSellers = [];
+    let statusFilter = 'all';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const auth = getAuth();
+      if (!auth || auth.user.role !== 'admin') { window.location.href = '../auth/login.html'; return; }
+      document.getElementById('navUserName').textContent = auth.user.name.split(' ')[0];
+      document.getElementById('sidebarName').textContent = auth.user.name;
+      document.getElementById('sidebarAvatar').textContent = auth.user.name.charAt(0).toUpperCase();
+      setupTabs();
+      loadSellers();
+      lucide.createIcons();
+    });
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('active');
+      document.getElementById('sidebarOverlay').classList.toggle('active');
+    }
+
+    function setupTabs() {
+      document.querySelectorAll('.status-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.status-tab').forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          statusFilter = tab.dataset.status;
+          renderSellers();
+        });
+      });
+    }
+
+    async function loadSellers() {
+      const res = await apiCall('/admin/sellers');
+      if (!res) return;
+      allSellers = res.data?.sellers || res.data || [];
+      renderSellers();
+    }
+
+    function renderSellers() {
+      const filtered = statusFilter === 'all' ? allSellers : allSellers.filter(s => s.isApproved === statusFilter);
+
+      if (!filtered.length) {
+        document.getElementById('sellersList').innerHTML = '<div class="empty-state"><div style="font-size:3rem;">🏪</div><h3>No sellers found</h3></div>';
+        return;
+      }
+
+      document.getElementById('sellersList').innerHTML = filtered.map(s => {
+        const user = s.userId || s.user || {};
+        const date = new Date(s.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+        const statusClass = 'approval-' + (s.isApproved || 'pending');
+        return `
+          <div class="seller-card">
+            <div class="seller-avatar">${(s.storeName || 'S').charAt(0).toUpperCase()}</div>
+            <div class="seller-info">
+              <div class="seller-name">${s.storeName || 'Unnamed Store'}</div>
+              <div class="seller-email">${user.email || 'N/A'} • ${user.name || 'N/A'}</div>
+              <div class="seller-meta">
+                GSTIN: ${s.gstin || 'N/A'} | Joined: ${date}
+                <br><span class="approval-badge ${statusClass}">${s.isApproved || 'pending'}</span>
+              </div>
+            </div>
+            <div class="seller-actions">
+              ${s.isApproved !== 'approved' ? `<button class="btn-approve" onclick="approveSeller('${s._id}')">✅ Approve</button>` : ''}
+              ${s.isApproved !== 'rejected' ? `<button class="btn-reject" onclick="rejectSeller('${s._id}')">❌ Reject</button>` : ''}
+            </div>
+          </div>`;
+      }).join('');
+    }
+
+    async function approveSeller(id) {
+      if (!confirm('Approve this seller?')) return;
+      const res = await apiCall(`/admin/sellers/${id}/approve`, 'PUT', { status: 'approved' });
+      if (res) { showToast('Seller approved!', 'success'); loadSellers(); }
+    }
+
+    async function rejectSeller(id) {
+      if (!confirm('Reject this seller?')) return;
+      const res = await apiCall(`/admin/sellers/${id}/approve`, 'PUT', { status: 'rejected' });
+      if (res) { showToast('Seller rejected', 'success'); loadSellers(); }
+    }
+
+    document.getElementById('userDropdownBtn')?.addEventListener('click', e => { e.stopPropagation(); document.getElementById('userDropdownMenu').classList.toggle('active'); });
+    document.addEventListener('click', () => document.getElementById('userDropdownMenu')?.classList.remove('active'));
+  </script>
+<button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+</body>
+</html>

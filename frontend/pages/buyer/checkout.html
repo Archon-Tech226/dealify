@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout - Dealify</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🛍️%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/responsive.css">
+  <style>
+    body { font-family: 'Inter', var(--font-family); background: var(--bg); }
+    .navbar { background: #1E3A8A !important; }
+    .navbar .navbar-logo, .navbar .navbar-logo span { color: #fff !important; }
+    .checkout-strip { background: linear-gradient(135deg, #1E3A8A, #2563EB); color: white; text-align: center; padding: 6px; font-size: 0.7rem; font-weight: 600; letter-spacing: 1px; }
+
+    .checkout-wrapper { max-width: 1100px; margin: 24px auto; padding: 0 16px; display: grid; grid-template-columns: 1fr 380px; gap: 24px; }
+    @media (max-width: 900px) { .checkout-wrapper { grid-template-columns: 1fr; } }
+
+    .section-card { background: #fff; border-radius: 12px; border: 1px solid var(--border); padding: 24px; margin-bottom: 20px; }
+    .section-title { font-size: 1.05rem; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+
+    .address-list { display: grid; gap: 12px; }
+    .address-card { padding: 16px; border: 2px solid var(--border); border-radius: 10px; cursor: pointer; transition: all 0.2s; position: relative; }
+    .address-card.selected { border-color: #1E3A8A; background: #EFF6FF; }
+    .address-card .addr-name { font-weight: 600; }
+    .address-card .addr-type { font-size: 0.7rem; background: #DBEAFE; color: #1E3A8A; padding: 2px 8px; border-radius: 4px; font-weight: 600; text-transform: uppercase; margin-left: 8px; }
+    .address-card .addr-detail { font-size: 0.9rem; color: var(--text-secondary); margin-top: 6px; }
+    .address-card .addr-phone { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
+
+    .add-address-btn { display: flex; align-items: center; gap: 8px; padding: 14px; border: 2px dashed var(--border); border-radius: 10px; background: none; cursor: pointer; width: 100%; color: #1E3A8A; font-weight: 600; font-size: 0.95rem; justify-content: center; }
+    .add-address-btn:hover { border-color: #1E3A8A; background: #EFF6FF; }
+
+    .address-form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+    .address-form .full-width { grid-column: 1 / -1; }
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    .form-group label { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); }
+    .form-group input, .form-group select { padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; }
+
+    .payment-option { display: flex; align-items: center; gap: 12px; padding: 16px; border: 2px solid var(--border); border-radius: 10px; cursor: pointer; margin-bottom: 10px; }
+    .payment-option.selected { border-color: #1E3A8A; background: #EFF6FF; }
+    .payment-radio { width: 20px; height: 20px; border: 2px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .payment-option.selected .payment-radio { border-color: #1E3A8A; }
+    .payment-option.selected .payment-radio::after { content: ''; width: 10px; height: 10px; background: #1E3A8A; border-radius: 50%; }
+
+    .order-summary { background: #fff; border-radius: 12px; border: 1px solid var(--border); padding: 24px; height: fit-content; position: sticky; top: 80px; }
+    .summary-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 0.95rem; }
+    .summary-row.total { font-weight: 700; font-size: 1.1rem; border-top: 2px solid var(--border); padding-top: 12px; margin-top: 12px; }
+    .btn-place-order { width: 100%; padding: 14px; background: #1E3A8A; color: #fff; border: none; border-radius: 10px; font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 16px; }
+    .btn-place-order:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .order-item-mini { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
+    .order-item-mini img { width: 50px; height: 50px; border-radius: 6px; object-fit: cover; }
+    .order-item-mini-info { flex: 1; font-size: 0.85rem; }
+    .order-item-mini-name { font-weight: 600; margin-bottom: 2px; }
+
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; }
+    .modal-overlay.active { display: flex; align-items: center; justify-content: center; }
+    .modal { background: #fff; border-radius: 16px; padding: 32px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
+    .back-btn { display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; border:1px solid var(--gray-300); background:#fff; color:var(--gray-800); font-size:0.85rem; font-weight:600; cursor:pointer; margin-bottom:12px; }
+    .back-btn:hover { background:var(--gray-100); }
+  </style>
+</head>
+<body>
+  <div class="checkout-strip">🔒 SECURE CHECKOUT</div>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="../../index.html" class="navbar-logo">Deal<span>ify</span></a>
+      <div style="color:#fff;font-weight:600;">Checkout</div>
+    </div>
+  </nav>
+  <div class="toast-container" id="toastContainer"></div>
+
+  <div class="checkout-wrapper">
+    <div class="checkout-left">
+      <button class="back-btn" onclick="goBack()"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i> Back</button>
+      <!-- Addresses -->
+      <div class="section-card">
+        <div class="section-title"><i data-lucide="map-pin" style="width:20px;height:20px;color:#1E3A8A;"></i> Delivery Address</div>
+        <div class="address-list" id="addressList"></div>
+        <button class="add-address-btn" onclick="toggleAddressForm()" id="addAddrBtn">
+          <i data-lucide="plus" style="width:18px;height:18px;"></i> Add New Address
+        </button>
+        <div id="addressFormWrap" style="display:none;">
+          <div class="address-form">
+            <div class="form-group"><label>Full Name</label><input id="addrName" placeholder="Full name"></div>
+            <div class="form-group"><label>Phone</label><input id="addrPhone" placeholder="10-digit phone"></div>
+            <div class="form-group full-width"><label>Address Line 1</label><input id="addrLine1" placeholder="House no., Building, Street"></div>
+            <div class="form-group full-width"><label>Address Line 2</label><input id="addrLine2" placeholder="Area, Colony (optional)"></div>
+            <div class="form-group"><label>City</label><input id="addrCity" placeholder="City"></div>
+            <div class="form-group"><label>State</label><input id="addrState" placeholder="State"></div>
+            <div class="form-group"><label>Pincode</label><input id="addrPincode" placeholder="6-digit pincode"></div>
+            <div class="form-group"><label>Type</label><select id="addrType"><option value="home">Home</option><option value="work">Work</option><option value="other">Other</option></select></div>
+            <div class="full-width" style="display:flex;gap:8px;margin-top:8px;">
+              <button class="btn btn-primary" onclick="saveAddress()">Save Address</button>
+              <button class="btn btn-secondary" onclick="toggleAddressForm()">Cancel</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Payment Method -->
+      <div class="section-card">
+        <div class="section-title"><i data-lucide="credit-card" style="width:20px;height:20px;color:#1E3A8A;"></i> Payment Method</div>
+        <div class="payment-option selected" onclick="selectPayment('cod', this)">
+          <div class="payment-radio"></div>
+          <div>
+            <div style="font-weight:600;">Cash on Delivery</div>
+            <div style="font-size:0.8rem;color:var(--muted);">Pay when your order is delivered</div>
+          </div>
+        </div>
+        <div class="payment-option" onclick="selectPayment('razorpay', this)">
+          <div class="payment-radio"></div>
+          <div>
+            <div style="font-weight:600;">Online Payment</div>
+            <div style="font-size:0.8rem;color:var(--muted);">UPI / Credit Card / Debit Card / Net Banking</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="order-summary">
+      <h3 style="margin:0 0 16px;">Order Summary</h3>
+      <div id="orderItems"></div>
+      <div class="summary-row" style="margin-top:12px;"><span>Subtotal</span><span id="summSubtotal">₹0</span></div>
+      <div class="summary-row"><span>Shipping</span><span id="summShipping">Free</span></div>
+      <div class="summary-row" id="summCouponRow" style="display:none;"><span>Coupon</span><span style="color:#16A34A;" id="summCoupon">-₹0</span></div>
+      <div class="summary-row total"><span>Total</span><span id="summTotal">₹0</span></div>
+      <button class="btn-place-order" id="placeOrderBtn" onclick="placeOrder()">PLACE ORDER</button>
+      <p style="text-align:center;font-size:0.75rem;color:var(--muted);margin-top:12px;">By placing your order, you agree to Dealify's terms of use and privacy policy.</p>
+    </div>
+  </div>
+
+  <script src="../../js/app.js"></script>
+  <script>
+    let addresses = [];
+    let selectedAddressId = null;
+    let selectedPayment = 'cod';
+    let cartData = null;
+    let couponCode = new URLSearchParams(window.location.search).get('coupon') || '';
+    let couponDiscount = 0;
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!isLoggedIn()) { window.location.href = '../auth/login.html'; return; }
+      lucide.createIcons();
+      await Promise.all([loadAddresses(), loadCart()]);
+      if (couponCode) await validateCoupon();
+    });
+
+    async function loadAddresses() {
+      const res = await apiCall('/addresses');
+      if (res) {
+        addresses = res.data;
+        renderAddresses();
+      }
+    }
+
+    function renderAddresses() {
+      if (addresses.length === 0) {
+        document.getElementById('addressList').innerHTML = '<p style="color:var(--muted);text-align:center;padding:16px;">No addresses saved. Add one below.</p>';
+        return;
+      }
+      document.getElementById('addressList').innerHTML = addresses.map(a => `
+        <div class="address-card ${a.isDefault || a._id === selectedAddressId ? 'selected' : ''}" onclick="selectAddress('${a._id}')">
+          <span class="addr-name">${a.name}</span>
+          <span class="addr-type">${a.type}</span>
+          <div class="addr-detail">${a.addressLine1}${a.addressLine2 ? ', ' + a.addressLine2 : ''}, ${a.city}, ${a.state} - ${a.pincode}</div>
+          <div class="addr-phone">📞 ${a.phone}</div>
+        </div>
+      `).join('');
+
+      if (!selectedAddressId) {
+        const defaultAddr = addresses.find(a => a.isDefault) || addresses[0];
+        selectedAddressId = defaultAddr._id;
+      }
+      document.querySelectorAll('.address-card').forEach(card => card.classList.remove('selected'));
+      const selectedCard = document.querySelector(`.address-card[onclick*="${selectedAddressId}"]`);
+      if (selectedCard) selectedCard.classList.add('selected');
+    }
+
+    function selectAddress(id) {
+      selectedAddressId = id;
+      document.querySelectorAll('.address-card').forEach(c => c.classList.remove('selected'));
+      document.querySelector(`.address-card[onclick*="${id}"]`).classList.add('selected');
+    }
+
+    function toggleAddressForm() {
+      const wrap = document.getElementById('addressFormWrap');
+      wrap.style.display = wrap.style.display === 'none' ? '' : 'none';
+    }
+
+    async function saveAddress() {
+      const data = {
+        name: document.getElementById('addrName').value.trim(),
+        phone: document.getElementById('addrPhone').value.trim(),
+        addressLine1: document.getElementById('addrLine1').value.trim(),
+        addressLine2: document.getElementById('addrLine2').value.trim(),
+        city: document.getElementById('addrCity').value.trim(),
+        state: document.getElementById('addrState').value.trim(),
+        pincode: document.getElementById('addrPincode').value.trim(),
+        type: document.getElementById('addrType').value,
+      };
+      if (!data.name || !data.phone || !data.addressLine1 || !data.city || !data.state || !data.pincode) {
+        showToast('Please fill all required fields', 'warning');
+        return;
+      }
+      const res = await apiCall('/addresses', 'POST', data);
+      if (res) {
+        showToast('Address added!', 'success');
+        toggleAddressForm();
+        await loadAddresses();
+        selectedAddressId = res.data._id;
+        renderAddresses();
+      }
+    }
+
+    async function loadCart() {
+      const res = await apiCall('/cart');
+      if (!res || !res.data || res.data.items.length === 0) {
+        showToast('Cart is empty', 'warning');
+        setTimeout(() => window.location.href = 'cart.html', 1000);
+        return;
+      }
+      cartData = res.data;
+      renderOrderItems();
+      updateSummary();
+    }
+
+    function renderOrderItems() {
+      document.getElementById('orderItems').innerHTML = cartData.items.map(item => {
+        const p = item.product;
+        const img = p.images?.[0]?.url || '';
+        return `<div class="order-item-mini">
+          ${img ? `<img src="${img}" alt="">` : ''}
+          <div class="order-item-mini-info">
+            <div class="order-item-mini-name">${p.name}</div>
+            <div>₹${item.price.toLocaleString('en-IN')} × ${item.quantity}</div>
+          </div>
+        </div>`;
+      }).join('');
+    }
+
+    async function validateCoupon() {
+      if (!couponCode) return;
+      const totalPrice = cartData.items.reduce((s, i) => s + i.price * i.quantity, 0);
+      const res = await apiCall('/coupons/validate', 'POST', { code: couponCode, orderAmount: totalPrice });
+      if (res) {
+        couponDiscount = res.data.discount;
+        document.getElementById('summCouponRow').style.display = '';
+        document.getElementById('summCoupon').textContent = `-₹${couponDiscount.toLocaleString('en-IN')}`;
+        updateSummary();
+      }
+    }
+
+    function updateSummary() {
+      const items = cartData.items;
+      const subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
+      const shipping = subtotal >= 499 ? 0 : 40;
+      const total = subtotal + shipping - couponDiscount;
+      document.getElementById('summSubtotal').textContent = `₹${subtotal.toLocaleString('en-IN')}`;
+      document.getElementById('summShipping').textContent = shipping === 0 ? 'Free' : `₹${shipping}`;
+      document.getElementById('summTotal').textContent = `₹${total.toLocaleString('en-IN')}`;
+    }
+
+    function selectPayment(method, el) {
+      selectedPayment = method;
+      document.querySelectorAll('.payment-option').forEach(o => o.classList.remove('selected'));
+      el.classList.add('selected');
+    }
+
+    function goBack() {
+      if (document.referrer) window.history.back();
+      else window.location.href = './cart.html';
+    }
+
+    async function placeOrder() {
+      if (!selectedAddressId) { showToast('Please select a delivery address', 'warning'); return; }
+
+      const address = addresses.find(a => a._id === selectedAddressId);
+      if (!address) { showToast('Invalid address selected', 'error'); return; }
+
+      const btn = document.getElementById('placeOrderBtn');
+      btn.disabled = true;
+      btn.textContent = 'Placing Order...';
+
+      const res = await apiCall('/orders', 'POST', {
+        shippingAddress: {
+          name: address.name,
+          phone: address.phone,
+          addressLine1: address.addressLine1,
+          addressLine2: address.addressLine2,
+          city: address.city,
+          state: address.state,
+          pincode: address.pincode,
+          landmark: address.landmark || '',
+        },
+        paymentMethod: selectedPayment,
+        couponCode: couponCode || undefined,
+      });
+
+      if (res) {
+        showToast('🎉 Order placed successfully!', 'success');
+        setTimeout(() => window.location.href = `order-success.html?id=${res.data._id}`, 1500);
+      } else {
+        btn.disabled = false;
+        btn.textContent = 'PLACE ORDER';
+      }
+    }
+  </script>
+</body>
+</html>

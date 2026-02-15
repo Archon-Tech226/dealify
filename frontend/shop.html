@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop - Dealify</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🛍️%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+  <style>
+    body { font-family: 'Inter', var(--font-family); background: var(--bg); }
+
+    /* Navbar */
+    .navbar { background: #1E3A8A; border-bottom: 1px solid #1D4ED8; box-shadow: var(--shadow-sm); position: sticky; top: 0; z-index: 100; }
+    .navbar-inner { max-width: 1400px; margin: 0 auto; padding: 0 var(--space-lg); display: flex; align-items: center; height: 64px; gap: var(--space-lg); }
+    .navbar-logo { font-size: 1.4rem; font-weight: 800; color: #fff; text-decoration: none; }
+    .navbar-logo span { color: #D1D5DB; }
+
+    .search-bar { flex: 1; max-width: 600px; position: relative; }
+    .search-bar input { width: 100%; padding: 10px 16px 10px 42px; border: 2px solid #374151; border-radius: var(--radius-full); font-size: 0.9rem; outline: none; transition: 0.2s; background:#0F172A; color:#F9FAFB; }
+    .search-bar input::placeholder { color:#9CA3AF; }
+    .search-bar input:focus { border-color: #9CA3AF; box-shadow: 0 0 0 3px rgba(255,255,255,0.08); }
+    .search-bar .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #9CA3AF; }
+
+    .nav-actions { margin-left: auto; display: flex; align-items: center; gap: var(--space-md); }
+    .nav-actions a { display: flex; align-items: center; gap: 6px; text-decoration: none; color: #E5E7EB; font-size: 0.85rem; font-weight: 600; padding: 8px 12px; border-radius: 999px; transition: 0.2s; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.06); }
+    .nav-actions a:hover { background: rgba(255,255,255,0.14); color: #fff; }
+
+    /* Shop Layout */
+    .shop-wrapper { max-width: 1400px; margin: 0 auto; padding: var(--space-xl) var(--space-lg); display: grid; grid-template-columns: 260px 1fr; gap: var(--space-xl); }
+
+    /* Filters Sidebar */
+    .filters-sidebar { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: var(--space-lg); height: fit-content; position: sticky; top: 80px; }
+    .filters-title { font-size: 1.05rem; font-weight: 700; margin-bottom: var(--space-lg); display: flex; align-items: center; justify-content: space-between; }
+    .filters-title button { background: none; border: none; color: #1E3A8A; font-size: 0.8rem; cursor: pointer; font-weight: 700; }
+
+    .filter-section { margin-bottom: var(--space-xl); }
+    .filter-section-title { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: var(--muted); letter-spacing: 0.5px; margin-bottom: var(--space-md); }
+
+    .category-list { list-style: none; }
+    .category-item { padding: 8px 12px; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; transition: 0.2s; color: var(--text-secondary); }
+    .category-item:hover { background: var(--bg); color: var(--text-primary); }
+    .category-item.active { background: #1E3A8A; color: #fff; font-weight: 600; }
+    .category-item .cat-count { margin-left: auto; font-size: 0.75rem; color: var(--muted); }
+
+    .price-range { display: flex; gap: var(--space-sm); align-items: center; }
+    .price-range input { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: var(--radius-sm); font-size: 0.85rem; }
+
+    .rating-filter { display: flex; flex-direction: column; gap: 6px; }
+    .rating-option { display: flex; align-items: center; gap: 6px; cursor: pointer; padding: 6px 8px; border-radius: var(--radius-sm); transition: 0.2s; font-size: 0.85rem; }
+    .rating-option:hover { background: var(--bg); }
+    .rating-option.active { background: #FEF3C7; }
+    .stars { color: #F59E0B; }
+
+    /* Sort Bar */
+    .sort-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-lg); flex-wrap: wrap; gap: var(--space-md); }
+    .sort-bar .result-count { font-size: 0.9rem; color: var(--text-secondary); }
+    .sort-bar .result-count strong { color: var(--text-primary); }
+    .sort-select { padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius-md); font-size: 0.85rem; background: var(--card-bg); cursor: pointer; }
+
+    /* Products Grid */
+    .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: var(--space-lg); }
+
+    .product-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; transition: all 0.25s; cursor: pointer; position: relative; }
+    .product-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-4px); }
+    .product-card-img { width: 100%; aspect-ratio: 1; object-fit: cover; background: #f8fafc; }
+    .product-card-body { padding: var(--space-md); }
+    .product-card-brand { font-size: 0.7rem; text-transform: uppercase; color: var(--muted); letter-spacing: 0.5px; font-weight: 600; }
+    .product-card-name { font-weight: 600; font-size: 0.9rem; margin: 4px 0; line-height: 1.3; display: -webkit-box; line-clamp: 2; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .product-card-price { display: flex; align-items: center; gap: 6px; margin-top: 8px; }
+    .product-card-price .sale { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
+    .product-card-price .mrp { font-size: 0.8rem; text-decoration: line-through; color: var(--muted); }
+    .product-card-price .off { font-size: 0.75rem; color: #16A34A; font-weight: 600; }
+    .product-card-rating { display: flex; align-items: center; gap: 4px; margin-top: 6px; font-size: 0.8rem; }
+    .product-card-rating .rating-badge { background: #16A34A; color: #fff; padding: 1px 6px; border-radius: 4px; font-weight: 600; font-size: 0.7rem; display: flex; align-items: center; gap: 2px; }
+    .product-card-shipping { font-size: 0.7rem; color: #16A34A; margin-top: 6px; font-weight: 500; }
+
+    .discount-badge { position: absolute; top: 10px; left: 10px; background: #DC2626; color: #fff; padding: 3px 8px; border-radius: var(--radius-sm); font-size: 0.7rem; font-weight: 700; }
+    .stock-badge { position: absolute; top: 10px; right: 10px; background: #FEF2F2; color: #B91C1C; padding: 3px 8px; border-radius: var(--radius-sm); font-size: 0.7rem; font-weight: 700; }
+
+    .wishlist-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.9); border: none; padding: 8px; border-radius: 50%; cursor: pointer; transition: 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .wishlist-btn:hover { background: #FEE2E2; color: #DC2626; }
+
+    /* Pagination */
+    .pagination { display: flex; justify-content: center; gap: 4px; margin-top: var(--space-2xl); }
+    .pagination button { padding: 10px 16px; border: 1px solid var(--border); border-radius: var(--radius-md); background: var(--card-bg); cursor: pointer; font-size: 0.9rem; font-weight: 500; transition: 0.2s; }
+    .pagination button.active { background: #1E3A8A; color: #fff; border-color: #1E3A8A; }
+    .pagination button:hover:not(.active):not(:disabled) { background: var(--bg); }
+    .pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .empty-state { text-align: center; padding: 4rem 2rem; color: var(--muted); grid-column: 1 / -1; }
+    .empty-state .icon { font-size: 4rem; margin-bottom: var(--space-lg); }
+
+    /* Mobile filter toggle */
+    .filter-toggle-btn { display: none; position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 50; background: #1E3A8A; color: #fff; border: none; padding: 12px 24px; border-radius: var(--radius-full); font-weight: 600; font-size: 0.9rem; cursor: pointer; box-shadow: 0 4px 20px rgba(30,58,138,0.35); }
+
+    .back-btn { display:inline-flex; align-items:center; gap:8px; margin-bottom:12px; padding:8px 12px; border-radius:999px; border:1px solid var(--gray-300); background:#fff; color:var(--gray-800); font-size:0.85rem; font-weight:600; cursor:pointer; }
+    .back-btn:hover { background:var(--gray-100); }
+
+    @media (max-width: 768px) {
+      .shop-wrapper { grid-template-columns: 1fr; }
+      .filters-sidebar { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 200; border-radius: 0; overflow-y: auto; }
+      .filters-sidebar.show { display: block; }
+      .filter-toggle-btn { display: flex; align-items: center; gap: 8px; }
+      .products-grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-md); }
+      .search-bar { display: none; }
+      .nav-actions span { display: none; }
+    }
+
+    @media (max-width: 480px) {
+      .products-grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-sm); }
+      .product-card-body { padding: var(--space-sm); }
+      .product-card-name { font-size: 0.8rem; }
+      .product-card-price .sale { font-size: 0.95rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="navbar-logo">Deal<span>ify</span></a>
+      <div class="search-bar">
+        <i data-lucide="search" class="search-icon" style="width:18px;height:18px;"></i>
+        <input type="text" id="searchInput" placeholder="Search for products, brands and more..." onkeydown="if(event.key==='Enter') applySearch()">
+      </div>
+      <div class="nav-actions">
+        <a href="pages/buyer/dashboard.html" id="accountLink"><i data-lucide="user" style="width:18px;height:18px;"></i> <span>Account</span></a>
+        <a href="pages/buyer/wishlist.html"><i data-lucide="heart" style="width:18px;height:18px;"></i> <span>Wishlist</span></a>
+        <a href="pages/buyer/cart.html"><i data-lucide="shopping-cart" style="width:18px;height:18px;"></i> <span>Cart</span></a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Shop Layout -->
+  <div class="shop-wrapper">
+
+    <!-- Filters Sidebar -->
+    <aside class="filters-sidebar" id="filtersSidebar">
+      <div class="filters-title">
+        Filters
+        <button onclick="clearAllFilters()">Clear All</button>
+      </div>
+
+      <!-- Categories -->
+      <div class="filter-section">
+        <div class="filter-section-title">Categories</div>
+        <ul class="category-list" id="categoryList">
+          <li class="category-item active" onclick="filterCategory('', this)">
+            <span>🛍️</span> All Categories
+          </li>
+        </ul>
+      </div>
+
+      <!-- Price Range -->
+      <div class="filter-section">
+        <div class="filter-section-title">Price Range</div>
+        <div class="price-range">
+          <input type="number" id="minPrice" placeholder="₹ Min" min="0">
+          <span style="color:var(--muted);">—</span>
+          <input type="number" id="maxPrice" placeholder="₹ Max" min="0">
+        </div>
+        <button class="btn btn-ghost" style="width:100%;margin-top:var(--space-sm);font-size:0.8rem;" onclick="applyPriceFilter()">Apply</button>
+      </div>
+
+      <!-- Rating -->
+      <div class="filter-section">
+        <div class="filter-section-title">Customer Rating</div>
+        <div class="rating-filter">
+          <div class="rating-option" onclick="filterRating(4, this)"><span class="stars">★★★★</span>☆ & up</div>
+          <div class="rating-option" onclick="filterRating(3, this)"><span class="stars">★★★</span>☆☆ & up</div>
+          <div class="rating-option" onclick="filterRating(2, this)"><span class="stars">★★</span>☆☆☆ & up</div>
+        </div>
+      </div>
+
+      <!-- Mobile Close -->
+      <button class="btn btn-primary" style="width:100%;margin-top:var(--space-lg);display:none;" id="applyFiltersMobile" onclick="closeMobileFilters()">
+        Apply Filters
+      </button>
+    </aside>
+
+    <!-- Products Area -->
+    <div class="products-area">
+      <!-- Sort Bar -->
+      <button class="back-btn" onclick="goBack()"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i> Back</button>
+      <div class="sort-bar">
+        <div class="result-count" id="resultCount">Showing <strong>0</strong> products</div>
+        <select class="sort-select" id="sortSelect" onchange="applySort()">
+          <option value="newest">Newest First</option>
+          <option value="popular">Most Popular</option>
+          <option value="price_low">Price: Low to High</option>
+          <option value="price_high">Price: High to Low</option>
+          <option value="rating">Highest Rated</option>
+        </select>
+      </div>
+
+      <!-- Products Grid -->
+      <div class="products-grid" id="productsGrid">
+        <div class="empty-state">
+          <div class="icon">⏳</div>
+          <p>Loading products...</p>
+        </div>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination" id="pagination"></div>
+    </div>
+  </div>
+
+  <!-- Mobile Filter Toggle -->
+  <button class="filter-toggle-btn" onclick="openMobileFilters()">
+    <i data-lucide="sliders-horizontal" style="width:18px;height:18px;"></i> Filters
+  </button>
+
+  <script src="js/app.js"></script>
+  <script>
+    let currentPage = 1;
+    let currentCategory = '';
+    let currentSort = 'newest';
+    let currentSearch = '';
+    let currentMinPrice = '';
+    let currentMaxPrice = '';
+    let currentRating = '';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Read URL params
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('category')) currentCategory = params.get('category');
+      if (params.get('search')) {
+        currentSearch = params.get('search');
+        document.getElementById('searchInput').value = currentSearch;
+      }
+
+      loadCategories();
+      loadProducts();
+      lucide.createIcons();
+
+      // Fix nav links based on auth
+      const auth = getAuth();
+      if (auth && auth.user) {
+        const dashUrl = getDashboardUrl ? getDashboardUrl(auth.user.role) : 'pages/buyer/dashboard.html';
+        document.getElementById('accountLink').href = dashUrl;
+      }
+    });
+
+    // ──── Load categories for filter ────
+    async function loadCategories() {
+      const res = await apiCall('/categories');
+      if (!res || !res.data) return;
+
+      const list = document.getElementById('categoryList');
+      res.data.forEach(cat => {
+        const li = document.createElement('li');
+        li.className = `category-item ${currentCategory === cat.slug ? 'active' : ''}`;
+        li.onclick = () => filterCategory(cat.slug, li);
+        li.innerHTML = `<span>${cat.icon}</span> ${cat.name} <span class="cat-count">${cat.productCount || 0}</span>`;
+        list.appendChild(li);
+      });
+
+      // Remove active from "All" if a specific category is selected
+      if (currentCategory) {
+        list.querySelector('.category-item.active:first-child')?.classList.remove('active');
+      }
+    }
+
+    // ──── Load products ────
+    async function loadProducts() {
+      let url = `/products?page=${currentPage}&limit=12&sort=${currentSort}`;
+      if (currentCategory) url += `&category=${currentCategory}`;
+      if (currentSearch) url += `&search=${encodeURIComponent(currentSearch)}`;
+      if (currentMinPrice) url += `&minPrice=${currentMinPrice}`;
+      if (currentMaxPrice) url += `&maxPrice=${currentMaxPrice}`;
+      if (currentRating) url += `&rating=${currentRating}`;
+
+      const res = await apiCall(url);
+      if (!res) return;
+
+      const products = res.data || [];
+      const grid = document.getElementById('productsGrid');
+      
+      document.getElementById('resultCount').innerHTML = `Showing <strong>${res.total || 0}</strong> products`;
+
+      if (products.length === 0) {
+        grid.innerHTML = `
+          <div class="empty-state">
+            <div class="icon">🔍</div>
+            <p style="font-weight:600;font-size:1.1rem;">No products found</p>
+            <p style="font-size:0.9rem;">Try changing your search or filters.</p>
+          </div>`;
+        document.getElementById('pagination').innerHTML = '';
+        return;
+      }
+
+      grid.innerHTML = products.map(p => {
+        const img = (p.images && p.images[0] && p.images[0].url) 
+          ? p.images[0].url 
+          : `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'><rect fill='%23f1f5f9' width='200' height='200'/><text x='100' y='100' text-anchor='middle' dy='.35em' fill='%2394a3b8' font-size='50'>📦</text></svg>`;
+        
+        const discount = p.mrp > p.price ? Math.round(((p.mrp - p.price) / p.mrp) * 100) : 0;
+        const ratingStr = p.rating > 0 ? `<div class="product-card-rating"><span class="rating-badge">★ ${p.rating.toFixed(1)}</span><span style="color:var(--muted);">(${p.numReviews})</span></div>` : '';
+        const freeShipping = p.shippingInfo && p.shippingInfo.freeShipping ? '<div class="product-card-shipping">🚚 Free Delivery</div>' : '';
+        const outOfStock = (p.stock || 0) <= 0;
+
+        return `
+          <div class="product-card" onclick="viewProduct('${p.slug}')">
+            ${discount > 0 ? `<div class="discount-badge">${discount}% OFF</div>` : ''}
+            ${outOfStock ? '<div class="stock-badge">Out of Stock</div>' : ''}
+            <button class="wishlist-btn" onclick="event.stopPropagation();addToWishlist('${p._id}')" title="Add to wishlist">❤</button>
+            <img class="product-card-img" src="${img}" alt="${p.name}" loading="lazy" onerror="this.style.background='#f8fafc'">
+            <div class="product-card-body">
+              ${p.brand ? `<div class="product-card-brand">${p.brand}</div>` : ''}
+              <div class="product-card-name">${p.name}</div>
+              <div class="product-card-price">
+                <span class="sale">₹${p.price.toLocaleString('en-IN')}</span>
+                ${discount > 0 ? `<span class="mrp">₹${p.mrp.toLocaleString('en-IN')}</span><span class="off">${discount}% off</span>` : ''}
+              </div>
+              ${ratingStr}
+              ${freeShipping}
+            </div>
+          </div>`;
+      }).join('');
+
+      renderPagination(res.pages, res.currentPage);
+    }
+
+    function viewProduct(slug) {
+      sessionStorage.setItem('dealify:lastProductSlug', slug);
+      window.location.href = `pages/product.html#slug=${encodeURIComponent(slug)}`;
+    }
+
+    function goBack() {
+      if (document.referrer) window.history.back();
+      else window.location.href = 'index.html';
+    }
+
+    async function addToWishlist(productId) {
+      if (!isLoggedIn()) {
+        window.location.href = 'pages/auth/login.html';
+        return;
+      }
+      const res = await apiCall('/wishlist', 'POST', { productId });
+      if (res && res.success) {
+        showToast(res.message || 'Added to wishlist ❤️', 'success');
+      }
+    }
+
+    // ──── Filters ────
+    function filterCategory(slug, el) {
+      currentCategory = slug;
+      currentPage = 1;
+      document.querySelectorAll('.category-item').forEach(i => i.classList.remove('active'));
+      if (el) el.classList.add('active');
+      loadProducts();
+    }
+
+    function applyPriceFilter() {
+      currentMinPrice = document.getElementById('minPrice').value;
+      currentMaxPrice = document.getElementById('maxPrice').value;
+      currentPage = 1;
+      loadProducts();
+    }
+
+    function filterRating(min, el) {
+      currentRating = currentRating == min ? '' : min;
+      document.querySelectorAll('.rating-option').forEach(o => o.classList.remove('active'));
+      if (currentRating) el.classList.add('active');
+      currentPage = 1;
+      loadProducts();
+    }
+
+    function applySort() {
+      currentSort = document.getElementById('sortSelect').value;
+      currentPage = 1;
+      loadProducts();
+    }
+
+    function applySearch() {
+      currentSearch = document.getElementById('searchInput').value.trim();
+      currentPage = 1;
+      loadProducts();
+    }
+
+    function clearAllFilters() {
+      currentCategory = '';
+      currentSearch = '';
+      currentMinPrice = '';
+      currentMaxPrice = '';
+      currentRating = '';
+      currentSort = 'newest';
+      currentPage = 1;
+      document.getElementById('searchInput').value = '';
+      document.getElementById('minPrice').value = '';
+      document.getElementById('maxPrice').value = '';
+      document.getElementById('sortSelect').value = 'newest';
+      document.querySelectorAll('.category-item').forEach(i => i.classList.remove('active'));
+      document.querySelector('.category-item').classList.add('active');
+      document.querySelectorAll('.rating-option').forEach(o => o.classList.remove('active'));
+      loadProducts();
+    }
+
+    // ──── Pagination ────
+    function renderPagination(totalPages, current) {
+      const pag = document.getElementById('pagination');
+      if (totalPages <= 1) { pag.innerHTML = ''; return; }
+      let html = `<button ${current === 1 ? 'disabled' : ''} onclick="goToPage(${current - 1})">‹ Prev</button>`;
+      for (let i = 1; i <= totalPages; i++) {
+        if (i === current || i === 1 || i === totalPages || (i >= current - 1 && i <= current + 1)) {
+          html += `<button class="${i === current ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+        } else if (i === current - 2 || i === current + 2) {
+          html += `<button disabled>...</button>`;
+        }
+      }
+      html += `<button ${current === totalPages ? 'disabled' : ''} onclick="goToPage(${current + 1})">Next ›</button>`;
+      pag.innerHTML = html;
+    }
+
+    function goToPage(page) { currentPage = page; loadProducts(); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+    // ──── Mobile Filters ────
+    function openMobileFilters() {
+      document.getElementById('filtersSidebar').classList.add('show');
+      document.getElementById('applyFiltersMobile').style.display = 'block';
+    }
+
+    function closeMobileFilters() {
+      document.getElementById('filtersSidebar').classList.remove('show');
+    }
+  </script>
+</body>
+</html>

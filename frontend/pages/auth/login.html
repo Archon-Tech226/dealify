@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Dealify</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🛍️%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/auth.css">
+  <link rel="stylesheet" href="../../css/responsive.css">
+  <style>body { font-family: 'Inter', var(--font-family); }</style>
+</head>
+<body>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <div class="auth-page">
+    
+    <!-- Left Panel - Branding -->
+    <div class="auth-brand">
+      <div class="auth-brand-logo">Deal<span>ify</span></div>
+      <h2>Welcome Back!</h2>
+      <p>Login to access your account. Shop from thousands of sellers with the best deals across India.</p>
+      <div class="auth-features">
+        <div class="auth-feature">
+          <div class="auth-feature-icon">🛒</div>
+          <div>
+            <strong>Track Your Orders</strong>
+            <p style="font-size:0.8rem;opacity:0.7;">Real-time order tracking</p>
+          </div>
+        </div>
+        <div class="auth-feature">
+          <div class="auth-feature-icon">❤️</div>
+          <div>
+            <strong>Manage Wishlist</strong>
+            <p style="font-size:0.8rem;opacity:0.7;">Save your favorite items</p>
+          </div>
+        </div>
+        <div class="auth-feature">
+          <div class="auth-feature-icon">🏷️</div>
+          <div>
+            <strong>Exclusive Deals</strong>
+            <p style="font-size:0.8rem;opacity:0.7;">Members-only discounts</p>
+          </div>
+        </div>
+        <div class="auth-feature">
+          <div class="auth-feature-icon">🔔</div>
+          <div>
+            <strong>Price Drop Alerts</strong>
+            <p style="font-size:0.8rem;opacity:0.7;">Never miss a deal</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel - Login Form -->
+    <div class="auth-form-container">
+      <div class="auth-card">
+        <div class="auth-card-header">
+          <div class="auth-card-logo">Deal<span>ify</span></div>
+          <h2>Login to your account</h2>
+          <p>Enter your email and password to continue</p>
+        </div>
+
+        <form class="auth-form" id="loginForm" onsubmit="handleLogin(event)">
+          <!-- Alert for errors -->
+          <div id="loginAlert" class="alert alert-error mb-md hidden" style="display:none;"></div>
+
+          <!-- Email -->
+          <div class="form-group">
+            <label class="form-label" for="email">Email Address</label>
+            <input 
+              type="email" 
+              class="form-input" 
+              id="email" 
+              name="email"
+              placeholder="Enter your email" 
+              required
+              autocomplete="email"
+            >
+            <span class="form-error" id="emailError"></span>
+          </div>
+
+          <!-- Password -->
+          <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <div class="password-wrapper">
+              <input 
+                type="password" 
+                class="form-input" 
+                id="password" 
+                name="password"
+                placeholder="Enter your password" 
+                required
+                minlength="6"
+                autocomplete="current-password"
+              >
+              <button type="button" class="password-toggle" onclick="togglePassword('password', this)">
+                <i data-lucide="eye" style="width:18px;height:18px;"></i>
+              </button>
+            </div>
+            <span class="form-error" id="passwordError"></span>
+          </div>
+
+          <!-- Remember & Forgot -->
+          <div class="auth-actions">
+            <label class="form-check">
+              <input type="checkbox" id="rememberMe" checked>
+              <span style="font-size:0.875rem;color:var(--gray-600);">Remember me</span>
+            </label>
+            <a href="forgot-password.html">Forgot Password?</a>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="auth-submit" id="loginBtn">
+            <span>Login</span>
+          </button>
+        </form>
+
+        <div class="divider-text">OR</div>
+
+        <!-- Footer Links -->
+        <div class="auth-footer">
+          <p>Don't have an account? <a href="register.html">Sign Up</a></p>
+          <p style="margin-top: 8px;">
+            <a href="register-seller.html" style="color: var(--accent-dark); font-weight: 500;">
+              Register as a Seller →
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script src="../../js/app.js"></script>
+  <script>
+    lucide.createIcons();
+
+    function togglePassword(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.innerHTML = '<i data-lucide="eye-off" style="width:18px;height:18px;"></i>';
+      } else {
+        input.type = 'password';
+        btn.innerHTML = '<i data-lucide="eye" style="width:18px;height:18px;"></i>';
+      }
+      lucide.createIcons();
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      
+      const btn = document.getElementById('loginBtn');
+      const alertEl = document.getElementById('loginAlert');
+      
+      // Clear previous errors
+      clearErrors();
+      alertEl.style.display = 'none';
+      
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      // Client-side validation
+      let hasError = false;
+
+      if (!email) {
+        showFieldError('email', 'Email is required');
+        hasError = true;
+      } else if (!isValidEmail(email)) {
+        showFieldError('email', 'Please enter a valid email');
+        hasError = true;
+      }
+
+      if (!password) {
+        showFieldError('password', 'Password is required');
+        hasError = true;
+      } else if (password.length < 6) {
+        showFieldError('password', 'Password must be at least 6 characters');
+        hasError = true;
+      }
+
+      if (hasError) return;
+
+      // Show loading
+      btn.disabled = true;
+      btn.innerHTML = '<div class="spinner spinner-sm"></div> <span>Logging in...</span>';
+
+      try {
+        const apiBaseUrl =
+          window.__APP_CONFIG__?.API_BASE_URL ||
+          localStorage.getItem('dealify_api_base_url') ||
+          ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:5000/api' : '/api');
+
+        const res = await fetch(`${apiBaseUrl}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ email, password })
+        });
+
+        const response = await res.json().catch(() => null);
+
+        if (!res.ok || !response?.success) {
+          let errorMessage = response?.message || 'Login failed. Please try again.';
+          if (/invalid email or password/i.test(errorMessage)) {
+            errorMessage = 'Password was incorrect';
+          }
+          alertEl.textContent = errorMessage;
+          alertEl.style.display = 'flex';
+          alertEl.classList.remove('hidden');
+          return;
+        }
+
+        if (response.success) {
+          // Save auth data
+          saveAuth(response.data);
+          showToast('Login successful! Redirecting...', 'success');
+
+          // Redirect based on role
+          setTimeout(() => {
+            const role = response.data.user.role;
+            if (role === 'admin') {
+              window.location.href = '../admin/dashboard.html';
+            } else if (role === 'seller') {
+              window.location.href = '../seller/dashboard.html';
+            } else {
+              window.location.href = '../../index.html';
+            }
+          }, 1000);
+        }
+      } catch (error) {
+        alertEl.textContent = 'Network error. Please check your connection and try again.';
+        alertEl.style.display = 'flex';
+        alertEl.classList.remove('hidden');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Login</span>';
+      }
+    }
+
+    function showFieldError(fieldId, message) {
+      const input = document.getElementById(fieldId);
+      const error = document.getElementById(fieldId + 'Error');
+      input.classList.add('error');
+      error.textContent = message;
+    }
+
+    function clearErrors() {
+      document.querySelectorAll('.form-input').forEach(el => el.classList.remove('error'));
+      document.querySelectorAll('.form-error').forEach(el => el.textContent = '');
+    }
+
+    function isValidEmail(email) {
+      return /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email);
+    }
+
+    // Redirect if already logged in
+    document.addEventListener('DOMContentLoaded', async () => {
+      const auth = getAuth();
+      if (auth && auth.token) {
+        const apiBaseUrl =
+          window.__APP_CONFIG__?.API_BASE_URL ||
+          localStorage.getItem('dealify_api_base_url') ||
+          ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:5000/api' : '/api');
+        // Verify token is still valid before redirecting
+        try {
+          const res = await fetch(`${apiBaseUrl}/auth/me`, {
+            headers: { 'Authorization': 'Bearer ' + auth.token }
+          });
+          if (res.ok) {
+            const role = auth.user.role;
+            if (role === 'admin') window.location.href = '../admin/dashboard.html';
+            else if (role === 'seller') window.location.href = '../seller/dashboard.html';
+            else window.location.href = '../../index.html';
+          } else {
+            clearAuth(); // Token expired/invalid
+          }
+        } catch(e) {
+          // API unreachable, let user stay on login
+        }
+      }
+    });
+  </script>
+</body>
+</html>

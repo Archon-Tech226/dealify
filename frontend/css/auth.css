@@ -1,0 +1,316 @@
+/* ===================================
+   DEALIFY - Auth Pages Styles
+   Login, Register, Forgot Password
+   =================================== */
+
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background decorative elements */
+.auth-page::before {
+  content: '';
+  position: absolute;
+  width: 400px;
+  height: 400px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  top: -100px;
+  right: -100px;
+}
+
+.auth-page::after {
+  content: '';
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+  bottom: -80px;
+  left: -80px;
+}
+
+/* ---- Left Panel (Branding) ---- */
+.auth-brand {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-3xl);
+  color: var(--white);
+  position: relative;
+  z-index: 1;
+}
+
+.auth-brand-logo {
+  font-size: 3rem;
+  font-weight: 800;
+  letter-spacing: -1px;
+  margin-bottom: var(--space-md);
+}
+
+.auth-brand-logo span {
+  color: var(--accent-light);
+}
+
+.auth-brand h2 {
+  color: var(--white);
+  font-size: var(--font-size-2xl);
+  font-weight: 600;
+  margin-bottom: var(--space-md);
+  text-align: center;
+}
+
+.auth-brand p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: var(--font-size-base);
+  text-align: center;
+  max-width: 400px;
+  line-height: 1.7;
+}
+
+.auth-features {
+  margin-top: var(--space-2xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+}
+
+.auth-feature {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: var(--font-size-sm);
+}
+
+.auth-feature-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+/* ---- Right Panel (Form) ---- */
+.auth-form-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl);
+  position: relative;
+  z-index: 1;
+}
+
+.auth-card {
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl);
+  width: 100%;
+  max-width: 460px;
+  padding: var(--space-2xl);
+  animation: fadeUp 0.4s ease-out;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.auth-card-header {
+  text-align: center;
+  margin-bottom: var(--space-xl);
+}
+
+.auth-card-logo {
+  font-size: var(--font-size-2xl);
+  font-weight: 800;
+  color: var(--primary);
+  margin-bottom: var(--space-sm);
+  display: none; /* Show only on mobile */
+}
+
+.auth-card-logo span {
+  color: var(--accent);
+}
+
+.auth-card-header h2 {
+  font-size: var(--font-size-2xl);
+  margin-bottom: var(--space-xs);
+}
+
+.auth-card-header p {
+  color: var(--gray-500);
+  font-size: var(--font-size-sm);
+}
+
+/* Password strength meter */
+.password-strength {
+  display: flex;
+  gap: 4px;
+  margin-top: var(--space-xs);
+}
+
+.strength-bar {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--gray-200);
+  transition: background var(--transition-fast);
+}
+
+.strength-bar.weak { background: var(--error); }
+.strength-bar.fair { background: var(--warning); }
+.strength-bar.good { background: var(--accent); }
+.strength-bar.strong { background: var(--success); }
+
+.strength-text {
+  font-size: var(--font-size-xs);
+  margin-top: 2px;
+}
+
+/* Auth form specifics */
+.auth-form .form-group {
+  margin-bottom: var(--space-md);
+}
+
+.auth-form .form-input {
+  padding: 0.8rem 1rem;
+  font-size: var(--font-size-base);
+}
+
+.auth-form .form-input:focus {
+  border-color: var(--primary);
+}
+
+.auth-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-lg);
+  font-size: var(--font-size-sm);
+}
+
+.auth-actions a {
+  color: var(--primary);
+  font-weight: 500;
+}
+
+.auth-actions a:hover {
+  text-decoration: underline;
+}
+
+.auth-submit {
+  width: 100%;
+  padding: 0.875rem;
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  background: var(--primary);
+  color: var(--white);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+}
+
+.auth-submit:hover:not(:disabled) {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+}
+
+.auth-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.auth-footer {
+  text-align: center;
+  margin-top: var(--space-lg);
+  font-size: var(--font-size-sm);
+  color: var(--gray-500);
+}
+
+.auth-footer a {
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.auth-footer a:hover {
+  text-decoration: underline;
+}
+
+/* Seller register specific */
+.seller-step-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-xl);
+}
+
+.step-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  border: 2px solid var(--gray-300);
+  color: var(--gray-400);
+  transition: all var(--transition-base);
+}
+
+.step-dot.active {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: var(--white);
+}
+
+.step-dot.completed {
+  border-color: var(--success);
+  background: var(--success);
+  color: var(--white);
+}
+
+.step-line {
+  width: 40px;
+  height: 2px;
+  background: var(--gray-300);
+  transition: background var(--transition-base);
+}
+
+.step-line.completed {
+  background: var(--success);
+}
+
+.step-content {
+  display: none;
+}
+
+.step-content.active {
+  display: block;
+  animation: fadeUp 0.3s ease-out;
+}
+
+.step-buttons {
+  display: flex;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+}

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coupon Management - Dealify Admin</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🛍️%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/dashboard.css">
+  <link rel="stylesheet" href="../../css/responsive.css">
+  <style>
+    body { font-family: 'Inter', var(--font-family); }
+    .navbar { background: linear-gradient(135deg, #1E1B4B, #312E81) !important; }
+    .navbar .navbar-logo, .navbar .navbar-logo span { color: #fff !important; }
+    .navbar .navbar-link, .navbar .navbar-link span { color: #fff !important; }
+    .admin-badge { background: linear-gradient(135deg, #EF4444, #DC2626); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; }
+    .dashboard-sidebar { background: #1E1B4B; border-right: none; }
+    .sidebar-header { background: linear-gradient(135deg, #312E81, #3730A3); border-bottom: 1px solid #4338CA; }
+    .sidebar-avatar { background: #EF4444 !important; color: #fff !important; }
+    .sidebar-user-info h4 { color: #fff !important; }
+    .sidebar-user-info p { color: #A5B4FC !important; }
+    .sidebar-link { color: #C7D2FE !important; }
+    .sidebar-link:hover { background: rgba(255,255,255,0.08) !important; }
+    .sidebar-link.active { background: rgba(99,102,241,0.2) !important; color: #fff !important; border-left: 3px solid #818CF8; }
+
+    .coupon-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+    .coupon-card { background: #fff; border-radius: 12px; border: 1px solid var(--border); padding: 20px; position: relative; }
+    .coupon-card.inactive { opacity: 0.6; }
+    .coupon-code { font-family: monospace; font-size: 1.2rem; font-weight: 800; letter-spacing: 2px; color: #312E81; margin-bottom: 8px; }
+    .coupon-type { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px; }
+    .coupon-meta { font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+    .coupon-status { position: absolute; top: 12px; right: 12px; padding: 2px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; }
+    .coupon-active { background: #D1FAE5; color: #065F46; }
+    .coupon-expired { background: #FEE2E2; color: #991B1B; }
+    .coupon-actions { display: flex; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #f1f5f9; }
+    .coupon-actions button { padding: 6px 14px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; cursor: pointer; border: none; }
+    .btn-toggle { background: #FEF3C7; color: #92400E; }
+    .btn-del { background: #FEE2E2; color: #DC2626; }
+
+    .add-coupon-card { background: #fff; border-radius: 12px; border: 2px dashed var(--border); padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 180px; cursor: pointer; color: #312E81; font-weight: 600; }
+    .add-coupon-card:hover { border-color: #312E81; background: #EEF2FF; }
+
+    .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center; }
+    .modal.active { display: flex; }
+    .modal-content { background: #fff; border-radius: 16px; padding: 32px; max-width: 500px; width: 90%; max-height: 80vh; overflow-y: auto; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-grid .full { grid-column: 1 / -1; }
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    .form-group label { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); }
+    .form-group input, .form-group select { padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.9rem; }
+    .date-group input { width: 100%; }
+    .date-quick-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .date-quick-actions button { border: 1px solid var(--border); background: #fff; color: #312E81; border-radius: 999px; padding: 6px 10px; font-size: 0.75rem; font-weight: 700; cursor: pointer; }
+    .date-quick-actions button:hover { background: #EEF2FF; border-color: #C7D2FE; }
+
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="admin-role-strip">🛡️ <strong>ADMIN PANEL</strong> — Full Platform Control</div>
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="../../index.html" class="navbar-logo">Deal<span>ify</span></a>
+      <div style="flex:1;"></div>
+      <div class="navbar-actions">
+        <span class="admin-badge">ADMIN</span>
+        <div class="user-dropdown">
+          <button class="navbar-link" id="userDropdownBtn"><i data-lucide="shield"></i><span id="navUserName">Admin</span></button>
+          <div class="user-dropdown-menu" id="userDropdownMenu">
+            <a href="dashboard.html"><i data-lucide="layout-dashboard" style="width:16px;height:16px;"></i> Dashboard</a>
+            <div class="user-dropdown-divider"></div>
+            <button onclick="logout()"><i data-lucide="log-out" style="width:16px;height:16px;"></i> Logout</button>
+          </div>
+        </div>
+      </div>
+      <div class="hamburger" onclick="toggleSidebar()"><span></span><span></span><span></span></div>
+    </div>
+  </nav>
+  <div class="toast-container" id="toastContainer"></div>
+
+  <div class="dashboard-wrapper">
+    <aside class="dashboard-sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-avatar" id="sidebarAvatar">A</div>
+        <div class="sidebar-user-info"><h4 id="sidebarName">Admin</h4><p style="font-size:0.7rem;">Super Admin</p></div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="dashboard.html" class="sidebar-link"><i data-lucide="layout-dashboard"></i> Dashboard</a>
+        <a href="users.html" class="sidebar-link"><i data-lucide="users"></i> All Users</a>
+        <a href="sellers.html" class="sidebar-link"><i data-lucide="store"></i> Sellers</a>
+        <a href="products.html" class="sidebar-link"><i data-lucide="package"></i> Products</a>
+        <a href="categories.html" class="sidebar-link"><i data-lucide="grid-3x3"></i> Categories</a>
+        <a href="orders.html" class="sidebar-link"><i data-lucide="shopping-bag"></i> Orders</a>
+        <a href="coupons.html" class="sidebar-link active"><i data-lucide="ticket"></i> Coupons</a>
+        <a href="#" class="sidebar-link" onclick="logout()"><i data-lucide="log-out"></i> Logout</a>
+      </nav>
+    </aside>
+    <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+    <main class="dashboard-content">
+      <div class="page-header">
+        <h1>🎟️ Coupons</h1>
+        <button class="btn btn-primary" onclick="openModal()">+ Create Coupon</button>
+      </div>
+
+      <div class="coupon-grid" id="couponGrid"></div>
+    </main>
+  </div>
+
+  <!-- Create/Edit Coupon Modal -->
+  <div class="modal" id="couponModal">
+    <div class="modal-content">
+      <h3 id="modalTitle" style="margin:0 0 20px;">Create Coupon</h3>
+      <input type="hidden" id="editId">
+      <div class="form-grid">
+        <div class="form-group"><label>Code *</label><input id="couponCode" placeholder="e.g. DEAL20" style="text-transform:uppercase;"></div>
+        <div class="form-group"><label>Type</label><select id="couponType"><option value="percentage">Percentage</option><option value="fixed">Fixed Amount</option></select></div>
+        <div class="form-group"><label>Value *</label><input id="couponValue" type="number" placeholder="e.g. 20"></div>
+        <div class="form-group"><label>Min Order Amount</label><input id="couponMin" type="number" placeholder="Min ₹"></div>
+        <div class="form-group"><label>Max Discount (₹)</label><input id="couponMaxDisc" type="number" placeholder="Max discount"></div>
+        <div class="form-group"><label>Usage Limit</label><input id="couponLimit" type="number" placeholder="Total uses"></div>
+        <div class="form-group full date-group"><label>Valid From</label><input id="couponFrom" type="date"></div>
+        <div class="form-group full date-group">
+          <label>Valid Till *</label>
+          <input id="couponTill" type="date" required>
+          <div class="date-quick-actions">
+            <button type="button" onclick="setCouponValidTillDays(7)">+7 Days</button>
+            <button type="button" onclick="setCouponValidTillDays(30)">+30 Days</button>
+            <button type="button" onclick="setCouponValidTillDays(90)">+90 Days</button>
+          </div>
+        </div>
+        <div class="full" style="display:flex;gap:8px;margin-top:12px;">
+          <button class="btn btn-primary" onclick="saveCoupon()">Save</button>
+          <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const auth = getAuth();
+      if (!auth || auth.user.role !== 'admin') { window.location.href = '../auth/login.html'; return; }
+      document.getElementById('navUserName').textContent = auth.user.name.split(' ')[0];
+      document.getElementById('sidebarName').textContent = auth.user.name;
+      document.getElementById('sidebarAvatar').textContent = auth.user.name.charAt(0).toUpperCase();
+      loadCoupons();
+      lucide.createIcons();
+    });
+
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('active');
+      document.getElementById('sidebarOverlay').classList.toggle('active');
+    }
+
+    async function loadCoupons() {
+      const res = await apiCall('/coupons');
+      if (!res) return;
+      const coupons = res.data || [];
+
+      const addCard = '<div class="add-coupon-card" onclick="openModal()"><i data-lucide="plus" style="width:32px;height:32px;margin-bottom:8px;"></i><span>Create New Coupon</span></div>';
+
+      if (!coupons.length) {
+        document.getElementById('couponGrid').innerHTML = addCard;
+        lucide.createIcons();
+        return;
+      }
+
+      document.getElementById('couponGrid').innerHTML = addCard + coupons.map(c => {
+        const now = new Date();
+        const validTill = new Date(c.validTill);
+        const isExpired = validTill < now;
+        const isActive = c.isActive && !isExpired;
+        const discountText = c.type === 'percentage' ? `${c.value}% OFF` : `₹${c.value} OFF`;
+        const validFrom = new Date(c.validFrom).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+        const validTillStr = validTill.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+        return `
+          <div class="coupon-card ${!isActive ? 'inactive' : ''}">
+            <span class="coupon-status ${isActive ? 'coupon-active' : 'coupon-expired'}">${isActive ? 'Active' : isExpired ? 'Expired' : 'Inactive'}</span>
+            <div class="coupon-code">${c.code}</div>
+            <div class="coupon-type">${discountText}</div>
+            <div class="coupon-meta">
+              Min Order: ₹${c.minOrderAmount || 0}<br>
+              ${c.maxDiscount ? 'Max Discount: ₹' + c.maxDiscount + '<br>' : ''}
+              Valid: ${validFrom} - ${validTillStr}<br>
+              Usage: ${c.usedBy?.length || 0}/${c.usageLimit || '∞'}
+            </div>
+            <div class="coupon-actions">
+              <button class="btn-toggle" onclick="toggleCoupon('${c._id}', ${c.isActive})">${c.isActive ? 'Deactivate' : 'Activate'}</button>
+              <button class="btn-del" onclick="deleteCoupon('${c._id}')">Delete</button>
+            </div>
+          </div>`;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function openModal(coupon) {
+      document.getElementById('couponModal').classList.add('active');
+      const today = toDateInputValue(new Date());
+      const fromInput = document.getElementById('couponFrom');
+      const tillInput = document.getElementById('couponTill');
+      if (coupon) {
+        document.getElementById('modalTitle').textContent = 'Edit Coupon';
+        document.getElementById('editId').value = coupon._id;
+        document.getElementById('couponCode').value = coupon.code;
+        document.getElementById('couponType').value = coupon.type;
+        document.getElementById('couponValue').value = coupon.value;
+        document.getElementById('couponMin').value = coupon.minOrderAmount || '';
+        document.getElementById('couponMaxDisc').value = coupon.maxDiscount || '';
+        document.getElementById('couponLimit').value = coupon.usageLimit || '';
+        fromInput.value = coupon.validFrom?.slice(0, 10) || today;
+        tillInput.value = coupon.validTill?.slice(0, 10) || '';
+      } else {
+        document.getElementById('modalTitle').textContent = 'Create Coupon';
+        document.getElementById('editId').value = '';
+        ['couponCode','couponValue','couponMin','couponMaxDisc','couponLimit','couponFrom','couponTill'].forEach(id => document.getElementById(id).value = '');
+        fromInput.value = today;
+        setCouponValidTillDays(30);
+      }
+      syncCouponDateLimits();
+    }
+
+    function closeModal() { document.getElementById('couponModal').classList.remove('active'); }
+
+    function toDateInputValue(date) {
+      const d = new Date(date);
+      const year = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    function setCouponValidTillDays(days) {
+      const fromInput = document.getElementById('couponFrom');
+      const tillInput = document.getElementById('couponTill');
+      const fromDate = fromInput.value ? new Date(fromInput.value) : new Date();
+      const target = new Date(fromDate);
+      target.setDate(target.getDate() + days);
+      tillInput.value = toDateInputValue(target);
+    }
+
+    function syncCouponDateLimits() {
+      const fromInput = document.getElementById('couponFrom');
+      const tillInput = document.getElementById('couponTill');
+      if (fromInput.value) {
+        tillInput.min = fromInput.value;
+        if (!tillInput.value || tillInput.value < fromInput.value) {
+          setCouponValidTillDays(30);
+        }
+      }
+    }
+
+    async function saveCoupon() {
+      const code = document.getElementById('couponCode').value.trim().toUpperCase();
+      const type = document.getElementById('couponType').value;
+      const value = Number(document.getElementById('couponValue').value);
+      const minOrderAmount = Number(document.getElementById('couponMin').value) || 0;
+      const maxDiscountValue = document.getElementById('couponMaxDisc').value;
+      const usageLimitValue = document.getElementById('couponLimit').value;
+      const validFromInput = document.getElementById('couponFrom').value;
+      const validTillInput = document.getElementById('couponTill').value;
+
+      if (!code) { showToast('Coupon code is required', 'warning'); return; }
+      if (!value || value <= 0) { showToast('Coupon value must be greater than 0', 'warning'); return; }
+      if (!validTillInput) { showToast('Valid Till date is required', 'warning'); return; }
+
+      const validFromDate = validFromInput ? new Date(validFromInput) : new Date();
+      const validTillDate = new Date(validTillInput);
+      if (validTillDate < validFromDate) {
+        showToast('Valid Till must be after Valid From date', 'warning');
+        return;
+      }
+
+      const data = {
+        code,
+        type,
+        value,
+        minOrderAmount,
+        maxDiscount: maxDiscountValue ? Number(maxDiscountValue) : undefined,
+        usageLimit: usageLimitValue ? Number(usageLimitValue) : undefined,
+        validFrom: validFromInput || new Date().toISOString(),
+        validTill: validTillInput,
+      };
+
+      const editId = document.getElementById('editId').value;
+      const res = editId
+        ? await apiCall(`/coupons/${editId}`, 'PUT', data)
+        : await apiCall('/coupons', 'POST', data);
+
+      if (res) { showToast(editId ? 'Coupon updated!' : 'Coupon created!', 'success'); closeModal(); loadCoupons(); }
+    }
+
+    async function toggleCoupon(id, currentActive) {
+      const res = await apiCall(`/coupons/${id}`, 'PUT', { isActive: !currentActive });
+      if (res) { showToast(`Coupon ${currentActive ? 'deactivated' : 'activated'}`, 'success'); loadCoupons(); }
+    }
+
+    async function deleteCoupon(id) {
+      if (!confirm('Delete this coupon?')) return;
+      const res = await apiCall(`/coupons/${id}`, 'DELETE');
+      if (res) { showToast('Coupon deleted', 'success'); loadCoupons(); }
+    }
+
+    document.getElementById('userDropdownBtn')?.addEventListener('click', e => { e.stopPropagation(); document.getElementById('userDropdownMenu').classList.toggle('active'); });
+    document.addEventListener('click', () => document.getElementById('userDropdownMenu')?.classList.remove('active'));
+    document.getElementById('couponFrom')?.addEventListener('change', syncCouponDateLimits);
+  </script>
+<button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+</body>
+</html>

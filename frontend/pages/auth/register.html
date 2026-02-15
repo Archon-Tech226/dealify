@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up - Dealify</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🛍️%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/auth.css">
+  <link rel="stylesheet" href="../../css/responsive.css">
+  <style>body { font-family: 'Inter', var(--font-family); }</style>
+</head>
+<body>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <div class="auth-page">
+    
+    <!-- Left Panel - Branding -->
+    <div class="auth-brand">
+      <div class="auth-brand-logo">Deal<span>ify</span></div>
+      <h2>Join Dealify Today!</h2>
+      <p>Create your account and start shopping from thousands of sellers across India with exclusive deals and offers.</p>
+      <div class="auth-features">
+        <div class="auth-feature">
+          <div class="auth-feature-icon">🎉</div>
+          <div>
+            <strong>Get ₹200 Off</strong>
+            <p style="font-size:0.8rem;opacity:0.7;">On your first order</p>
+          </div>
+        </div>
+        <div class="auth-feature">
+          <div class="auth-feature-icon">📦</div>
+          <div>
+            <strong>Free Delivery</strong>
+            <p style="font-size:0.8rem;opacity:0.7;">On orders above ₹499</p>
+          </div>
+        </div>
+        <div class="auth-feature">
+          <div class="auth-feature-icon">🔒</div>
+          <div>
+            <strong>Secure Shopping</strong>
+            <p style="font-size:0.8rem;opacity:0.7;">100% payment protection</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Panel - Register Form -->
+    <div class="auth-form-container">
+      <div class="auth-card">
+        <div class="auth-card-header">
+          <div class="auth-card-logo">Deal<span>ify</span></div>
+          <h2>Create your account</h2>
+          <p>Fill in the details below to get started</p>
+        </div>
+
+        <form class="auth-form" id="registerForm" onsubmit="handleRegister(event)">
+          <!-- Full Name -->
+          <div class="form-group">
+            <label class="form-label" for="name">Full Name</label>
+            <input 
+              type="text" 
+              class="form-input" 
+              id="name" 
+              placeholder="Enter your full name" 
+              required
+              minlength="2"
+              maxlength="50"
+              autocomplete="name"
+            >
+            <span class="form-error" id="nameError"></span>
+          </div>
+
+          <!-- Email -->
+          <div class="form-group">
+            <label class="form-label" for="email">Email Address</label>
+            <input 
+              type="email" 
+              class="form-input" 
+              id="email" 
+              placeholder="Enter your email" 
+              required
+              autocomplete="email"
+            >
+            <span class="form-error" id="emailError"></span>
+          </div>
+
+          <!-- Phone -->
+          <div class="form-group">
+            <label class="form-label" for="phone">Phone Number</label>
+            <div style="display:flex;gap:8px;">
+              <input 
+                type="text" 
+                class="form-input" 
+                value="+91" 
+                disabled 
+                style="width:60px;text-align:center;background:var(--gray-100);color:var(--gray-600);"
+              >
+              <input 
+                type="tel" 
+                class="form-input" 
+                id="phone" 
+                placeholder="Enter 10-digit number" 
+                required
+                maxlength="10"
+                pattern="[6-9][0-9]{9}"
+                autocomplete="tel"
+                style="flex:1;"
+              >
+            </div>
+            <span class="form-error" id="phoneError"></span>
+          </div>
+
+          <!-- Password -->
+          <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <div class="password-wrapper">
+              <input 
+                type="password" 
+                class="form-input" 
+                id="password" 
+                placeholder="Create a strong password" 
+                required
+                minlength="6"
+                autocomplete="new-password"
+                oninput="checkPasswordStrength(this.value)"
+              >
+              <button type="button" class="password-toggle" onclick="togglePassword('password', this)">
+                <i data-lucide="eye" style="width:18px;height:18px;"></i>
+              </button>
+            </div>
+            <div class="password-strength" id="strengthBars">
+              <div class="strength-bar" id="str1"></div>
+              <div class="strength-bar" id="str2"></div>
+              <div class="strength-bar" id="str3"></div>
+              <div class="strength-bar" id="str4"></div>
+            </div>
+            <span class="form-hint" id="strengthText"></span>
+            <span class="form-error" id="passwordError"></span>
+          </div>
+
+          <!-- Confirm Password -->
+          <div class="form-group">
+            <label class="form-label" for="confirmPassword">Confirm Password</label>
+            <div class="password-wrapper">
+              <input 
+                type="password" 
+                class="form-input" 
+                id="confirmPassword" 
+                placeholder="Re-enter your password" 
+                required
+                autocomplete="new-password"
+              >
+              <button type="button" class="password-toggle" onclick="togglePassword('confirmPassword', this)">
+                <i data-lucide="eye" style="width:18px;height:18px;"></i>
+              </button>
+            </div>
+            <span class="form-error" id="confirmPasswordError"></span>
+          </div>
+
+          <!-- Terms -->
+          <div class="form-group">
+            <label class="form-check">
+              <input type="checkbox" id="terms" required>
+              <span style="font-size:0.8rem;color:var(--gray-600);">
+                I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
+              </span>
+            </label>
+            <span class="form-error" id="termsError"></span>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="auth-submit" id="registerBtn">
+            <span>Create Account</span>
+          </button>
+
+          <!-- Alert -->
+          <div id="registerAlert" class="alert alert-error mt-md" style="display:none;"></div>
+        </form>
+
+        <div class="divider-text">OR</div>
+
+        <div class="auth-footer">
+          <p>Already have an account? <a href="login.html">Login</a></p>
+          <p style="margin-top: 8px;">
+            <a href="register-seller.html" style="color: var(--accent-dark); font-weight: 500;">
+              Want to sell? Register as Seller →
+            </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../js/app.js"></script>
+  <script>
+    lucide.createIcons();
+
+    function togglePassword(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.innerHTML = '<i data-lucide="eye-off" style="width:18px;height:18px;"></i>';
+      } else {
+        input.type = 'password';
+        btn.innerHTML = '<i data-lucide="eye" style="width:18px;height:18px;"></i>';
+      }
+      lucide.createIcons();
+    }
+
+    function checkPasswordStrength(password) {
+      const bars = [document.getElementById('str1'), document.getElementById('str2'), 
+                    document.getElementById('str3'), document.getElementById('str4')];
+      const text = document.getElementById('strengthText');
+      
+      // Reset
+      bars.forEach(b => b.className = 'strength-bar');
+      text.textContent = '';
+
+      if (!password) return;
+
+      let strength = 0;
+      if (password.length >= 6) strength++;
+      if (password.length >= 8) strength++;
+      if (/[A-Z]/.test(password) && /[a-z]/.test(password)) strength++;
+      if (/[0-9]/.test(password)) strength++;
+      if (/[^A-Za-z0-9]/.test(password)) strength++;
+
+      const levels = ['', 'weak', 'fair', 'good', 'strong'];
+      const labels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
+      const colors = ['', 'var(--error)', 'var(--warning)', 'var(--accent)', 'var(--success)'];
+
+      const level = Math.min(strength, 4);
+      for (let i = 0; i < level; i++) {
+        bars[i].className = 'strength-bar ' + levels[level];
+      }
+      text.textContent = labels[level];
+      text.style.color = colors[level];
+    }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      
+      const btn = document.getElementById('registerBtn');
+      const alertEl = document.getElementById('registerAlert');
+      
+      clearErrors();
+      alertEl.style.display = 'none';
+
+      const name = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+      const terms = document.getElementById('terms').checked;
+
+      // Validation
+      let hasError = false;
+
+      if (!name || name.length < 2) {
+        showFieldError('name', 'Name must be at least 2 characters');
+        hasError = true;
+      }
+
+      if (!isValidEmail(email)) {
+        showFieldError('email', 'Please enter a valid email');
+        hasError = true;
+      }
+
+      if (!phone || !/^[6-9]\d{9}$/.test(phone)) {
+        showFieldError('phone', 'Please enter a valid 10-digit Indian phone number');
+        hasError = true;
+      }
+
+      if (!password || password.length < 6) {
+        showFieldError('password', 'Password must be at least 6 characters');
+        hasError = true;
+      }
+
+      if (password !== confirmPassword) {
+        showFieldError('confirmPassword', 'Passwords do not match');
+        hasError = true;
+      }
+
+      if (!terms) {
+        showFieldError('terms', 'You must agree to the terms');
+        hasError = true;
+      }
+
+      if (hasError) return;
+
+      btn.disabled = true;
+      btn.innerHTML = '<div class="spinner spinner-sm"></div> <span>Creating account...</span>';
+
+      try {
+        const response = await apiCall('/auth/register', 'POST', { name, email, phone, password });
+        
+        if (!response) return;
+
+        if (response.success) {
+          saveAuth(response.data);
+          showToast('Account created successfully! Redirecting...', 'success');
+          setTimeout(() => {
+            window.location.href = '../buyer/dashboard.html';
+          }, 1500);
+        }
+      } catch (error) {
+        alertEl.textContent = error.message || 'Registration failed. Please try again.';
+        alertEl.style.display = 'flex';
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Create Account</span>';
+      }
+    }
+
+    function showFieldError(fieldId, message) {
+      const input = document.getElementById(fieldId);
+      const error = document.getElementById(fieldId + 'Error');
+      if (input && input.classList) input.classList.add('error');
+      if (error) error.textContent = message;
+    }
+
+    function clearErrors() {
+      document.querySelectorAll('.form-input').forEach(el => el.classList.remove('error'));
+      document.querySelectorAll('.form-error').forEach(el => el.textContent = '');
+    }
+
+    function isValidEmail(email) {
+      return /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(email);
+    }
+
+    // Redirect if already logged in
+    document.addEventListener('DOMContentLoaded', async () => {
+      const auth = getAuth();
+      if (auth && auth.token) {
+        const apiBaseUrl =
+          window.__APP_CONFIG__?.API_BASE_URL ||
+          localStorage.getItem('dealify_api_base_url') ||
+          ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:5000/api' : '/api');
+        try {
+          const res = await fetch(`${apiBaseUrl}/auth/me`, {
+            headers: { 'Authorization': 'Bearer ' + auth.token }
+          });
+          if (res.ok) {
+            window.location.href = getDashboardUrl(auth.user.role).replace(/.*pages\//, '../');
+          } else {
+            clearAuth();
+          }
+        } catch(e) { /* stay on page */ }
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Placed! - Dealify</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🛍️%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/responsive.css">
+  <style>
+    body { font-family: 'Inter', sans-serif; background: var(--bg); display: flex; min-height: 100vh; align-items: center; justify-content: center; }
+    .success-card { background: #fff; border-radius: 20px; padding: 48px; text-align: center; max-width: 500px; width: 90%; box-shadow: 0 8px 32px rgba(0,0,0,0.08); }
+    .success-icon { font-size: 5rem; margin-bottom: 16px; animation: bounce 0.6s ease; }
+    @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+    .success-card h1 { font-size: 1.8rem; margin: 0 0 8px; color: var(--text-primary); }
+    .success-card p { color: var(--muted); margin: 0 0 24px; }
+    .order-id { background: #F5F3FF; padding: 12px 20px; border-radius: 10px; display: inline-block; font-weight: 700; color: #7C3AED; font-size: 1.1rem; margin-bottom: 24px; }
+    .success-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .success-actions a { padding: 12px 24px; border-radius: 10px; font-weight: 600; text-decoration: none; font-size: 0.95rem; }
+    .btn-orders { background: #7C3AED; color: #fff; }
+    .btn-shop { background: #f1f5f9; color: var(--text-primary); }
+  </style>
+</head>
+<body>
+  <div class="success-card">
+    <div class="success-icon">🎉</div>
+    <h1>Order Placed Successfully!</h1>
+    <p>Thank you for shopping with Dealify. Your order has been confirmed.</p>
+    <div class="order-id" id="orderId">Loading...</div>
+    <p style="font-size:0.9rem;color:var(--muted);margin-bottom:24px;">A confirmation email has been sent to your email address.</p>
+    <div class="success-actions">
+      <a href="orders.html" class="btn-orders">📦 View My Orders</a>
+      <a href="../../shop.html" class="btn-shop">🛍️ Continue Shopping</a>
+    </div>
+  </div>
+
+  <script src="../../js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const id = new URLSearchParams(window.location.search).get('id');
+      if (id) {
+        const res = await apiCall(`/orders/${id}`);
+        if (res && res.data) {
+          document.getElementById('orderId').textContent = `Order #${res.data.orderId}`;
+        }
+      }
+    });
+  </script>
+</body>
+</html>
