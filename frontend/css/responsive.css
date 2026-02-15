@@ -28,12 +28,45 @@
     --navbar-height: 56px;
   }
 
+  html,
+  body {
+    overflow-x: hidden;
+  }
+
+  * {
+    min-width: 0;
+  }
+
   h1 { font-size: var(--font-size-2xl); }
   h2 { font-size: var(--font-size-xl); }
   h3 { font-size: var(--font-size-lg); }
 
   .container {
     padding: 0 var(--space-sm);
+  }
+
+  .navbar-inner {
+    gap: var(--space-sm) !important;
+    padding: 0 var(--space-sm) !important;
+    min-width: 0;
+  }
+
+  .navbar-logo {
+    font-size: 1.1rem !important;
+  }
+
+  .navbar-actions,
+  .nav-actions {
+    gap: 6px !important;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    margin-left: auto;
+    min-width: 0;
+  }
+
+  .navbar-link {
+    padding: 6px 10px !important;
+    font-size: 0.82rem !important;
   }
 
   /* ---- Auth Page Mobile ---- */
@@ -131,6 +164,51 @@
   .dashboard-content {
     margin-left: 0 !important;
     padding: var(--space-md) !important;
+    width: 100%;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .dashboard-grid,
+  .address-grid,
+  .checkout-wrapper {
+    grid-template-columns: 1fr !important;
+  }
+
+  .quick-actions,
+  .products-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .checkout-wrapper {
+    margin: 16px auto !important;
+    padding: 0 12px !important;
+    gap: 16px !important;
+  }
+
+  .order-summary {
+    position: static !important;
+    top: auto !important;
+  }
+
+  .address-form,
+  .step-buttons {
+    grid-template-columns: 1fr !important;
+  }
+
+  .modal-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .section-card,
+  .card,
+  .order-summary,
+  .dashboard-card {
+    max-width: 100%;
+    overflow-wrap: anywhere;
   }
 
   .sidebar-toggle {
@@ -140,10 +218,22 @@
   /* ---- Tables Mobile ---- */
   .table-wrapper {
     font-size: var(--font-size-xs);
+    overflow-x: auto !important;
   }
 
   .table th, .table td {
     padding: var(--space-sm);
+  }
+
+  .table,
+  .products-table,
+  .orders-table,
+  .users-table {
+    min-width: 640px;
+  }
+
+  .products-table-wrap {
+    overflow-x: auto !important;
   }
 
   /* ---- Modal Mobile ---- */
@@ -189,6 +279,11 @@
     padding: var(--space-lg) var(--space-md);
   }
 
+  .navbar-link {
+    padding: 6px 8px !important;
+    font-size: 0.78rem !important;
+  }
+
   .auth-submit {
     padding: 0.75rem;
     font-size: var(--font-size-sm);
@@ -211,6 +306,19 @@
   /* Cards stack fully */
   .stats-grid {
     grid-template-columns: 1fr !important;
+  }
+
+  .products-grid,
+  .quick-actions,
+  .address-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .table,
+  .products-table,
+  .orders-table,
+  .users-table {
+    min-width: 560px;
   }
 }
 
