@@ -3,7 +3,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://YOUR-RENDER-SERVICE.onrender.com/api/$1"
+      "destination": "https://dealify-backend-9516.onrender.com/api/$1"
     }
   ]
 }
