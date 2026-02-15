@@ -1,5 +1,7 @@
 {
   "cleanUrls": false,
+  "buildCommand": "",
+  "outputDirectory": ".",
   "rewrites": [
     {
       "source": "/api/(.*)",
