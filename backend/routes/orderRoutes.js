@@ -14,6 +14,7 @@ router.post('/', protect, roleGuard('buyer'), async (req, res) => {
   const session = await mongoose.startSession();
   try {
     const { shippingAddress, paymentMethod = 'cod', couponCode, notes } = req.body;
+    const shouldFinalizeImmediately = paymentMethod === 'cod';
 
     let createdOrder;
 
@@ -94,22 +95,23 @@ router.post('/', protect, roleGuard('buyer'), async (req, res) => {
       ], { session });
       createdOrder = created[0];
 
-      for (const item of orderItems) {
-        const updated = await Product.findOneAndUpdate(
-          { _id: item.product, stock: { $gte: item.quantity } },
-          { $inc: { stock: -item.quantity, totalSold: item.quantity } },
-          { session, new: true }
-        );
-        if (!updated) {
-          throw new Error(`INSUFFICIENT_STOCK:${item.name}`);
+      if (shouldFinalizeImmediately) {
+        for (const item of orderItems) {
+          const updated = await Product.findOneAndUpdate(
+            { _id: item.product, stock: { $gte: item.quantity } },
+            { $inc: { stock: -item.quantity, totalSold: item.quantity } },
+            { session, new: true }
+          );
+          if (!updated) {
+            throw new Error(`INSUFFICIENT_STOCK:${item.name}`);
+          }
         }
-      }
 
-      cart.items = [];
-      await cart.save({ session });
+        cart.items = [];
+        await cart.save({ session });
+      }
     });
 
-    // Send email notification (non-blocking)
     try {
       const emailService = require('../services/emailService');
       emailService.sendOrderConfirmation(req.user, createdOrder);
@@ -169,12 +171,18 @@ router.put('/:id/cancel', protect, roleGuard('buyer'), async (req, res) => {
     }
 
     order.orderStatus = 'cancelled';
-    order.items.forEach(item => { item.status = 'cancelled'; item.cancelledAt = new Date(); item.cancelReason = req.body.reason || 'Cancelled by buyer'; });
+    order.items.forEach(item => {
+      item.status = 'cancelled';
+      item.cancelledAt = new Date();
+      item.cancelReason = req.body.reason || 'Cancelled by buyer';
+    });
     await order.save();
 
-    // Restore stock
-    for (const item of order.items) {
-      await Product.findByIdAndUpdate(item.product, { $inc: { stock: item.quantity, totalSold: -item.quantity } });
+    const shouldRestoreStock = order.paymentInfo.method === 'cod' || order.paymentInfo.status === 'paid';
+    if (shouldRestoreStock) {
+      for (const item of order.items) {
+        await Product.findByIdAndUpdate(item.product, { $inc: { stock: item.quantity, totalSold: -item.quantity } });
+      }
     }
 
     res.json({ success: true, message: 'Order cancelled', data: order });
@@ -232,7 +240,6 @@ router.put('/:orderId/item/:itemId/status', protect, roleGuard('seller'), async 
     if (trackingId) item.trackingId = trackingId;
     if (status === 'delivered') item.deliveredAt = new Date();
 
-    // Update overall order status based on all items
     const allStatuses = order.items.map(i => i.status);
     if (allStatuses.every(s => s === 'delivered')) {
       order.orderStatus = 'delivered';
@@ -294,7 +301,6 @@ router.get('/:id', protect, async (req, res) => {
 
     if (!order) return res.status(404).json({ success: false, message: 'Order not found' });
 
-    // Check ownership (buyers see their own, sellers see orders with their items, admin sees all)
     if (req.user.role === 'buyer' && order.user._id.toString() !== req.user._id.toString()) {
       return res.status(403).json({ success: false, message: 'Not authorized' });
     }

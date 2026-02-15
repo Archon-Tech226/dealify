@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <link rel="stylesheet" href="../../css/style.css">
   <link rel="stylesheet" href="../../css/components.css">
   <link rel="stylesheet" href="../../css/responsive.css">
@@ -304,9 +305,95 @@
       });
 
       if (res) {
+        const orderId = res.data._id;
+
+        if (selectedPayment === 'cod') {
+          showToast('🎉 Order placed successfully!', 'success');
+          setTimeout(() => window.location.href = `order-success.html?id=${orderId}`, 1500);
+          return;
+        }
+
+        if (selectedPayment === 'razorpay') {
+          await initiateRazorpayPayment(orderId, address);
+          return;
+        }
+
         showToast('🎉 Order placed successfully!', 'success');
-        setTimeout(() => window.location.href = `order-success.html?id=${res.data._id}`, 1500);
+        setTimeout(() => window.location.href = `order-success.html?id=${orderId}`, 1500);
       } else {
+        btn.disabled = false;
+        btn.textContent = 'PLACE ORDER';
+      }
+    }
+
+    async function initiateRazorpayPayment(orderId, address) {
+      try {
+        const paymentRes = await apiCall('/payments/create-order', 'POST', { orderId });
+        if (!paymentRes || !paymentRes.success) {
+          throw new Error((paymentRes && paymentRes.message) || 'Unable to initiate payment');
+        }
+
+        const paymentData = paymentRes.data;
+        const profileRes = await apiCall('/users/profile');
+
+        const options = {
+          key: paymentData.keyId,
+          amount: paymentData.amount,
+          currency: paymentData.currency,
+          name: 'Dealify',
+          description: `Order #${orderId.slice(-8)}`,
+          order_id: paymentData.orderId,
+          prefill: {
+            name: profileRes?.data?.name || address.name || '',
+            email: profileRes?.data?.email || '',
+            contact: address.phone || '',
+          },
+          theme: {
+            color: '#1E3A8A',
+          },
+          handler: async function (response) {
+            await verifyPayment(orderId, response);
+          },
+          modal: {
+            ondismiss: function () {
+              showToast('Payment cancelled. You can retry from My Orders.', 'info');
+              const btn = document.getElementById('placeOrderBtn');
+              btn.disabled = false;
+              btn.textContent = 'PLACE ORDER';
+            },
+          },
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.open();
+      } catch (error) {
+        console.error('Razorpay start error:', error);
+        showToast(error.message || 'Payment initiation failed', 'error');
+        const btn = document.getElementById('placeOrderBtn');
+        btn.disabled = false;
+        btn.textContent = 'PLACE ORDER';
+      }
+    }
+
+    async function verifyPayment(orderId, paymentResponse) {
+      try {
+        const verifyRes = await apiCall('/payments/verify-payment', 'POST', {
+          orderId,
+          razorpayOrderId: paymentResponse.razorpay_order_id,
+          razorpayPaymentId: paymentResponse.razorpay_payment_id,
+          razorpaySignature: paymentResponse.razorpay_signature,
+        });
+
+        if (!verifyRes || !verifyRes.success) {
+          throw new Error((verifyRes && verifyRes.message) || 'Payment verification failed');
+        }
+
+        showToast('🎉 Payment successful!', 'success');
+        setTimeout(() => window.location.href = `order-success.html?id=${orderId}&payment=success`, 1200);
+      } catch (error) {
+        console.error('Razorpay verify error:', error);
+        showToast(error.message || 'Payment verification failed', 'error');
+        const btn = document.getElementById('placeOrderBtn');
         btn.disabled = false;
         btn.textContent = 'PLACE ORDER';
       }
